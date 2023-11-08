@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stopwatch</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  .stopwatch {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+  button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin: 5px;
+  }
+</style>
+</head>
+<body>
+  <h1>Stopwatch</h1>
+  <div class="stopwatch" id="display">0:00:00</div>
+  <button onclick="start()">Start</button>
+  <button onclick="pause()">Pause</button>
+  <button onclick="reset()">Reset</button>
+  <button onclick="lap()">Lap</button>
+  <ul id="laps"></ul>
+
+  <script>
+    let startTime;
+    let interval;
+    let laps = [];
+    
+    function start() {
+      if (!startTime) {
+        startTime = Date.now() - (laps.length > 0 ? laps.reduce((acc, lap) => acc + lap, 0) : 0);
+        interval = setInterval(updateDisplay, 10);
+      }
+    }
+
+    function pause() {
+      clearInterval(interval);
+      interval = null;
+    }
+
+    function reset() {
+      clearInterval(interval);
+      interval = null;
+      startTime = null;
+      laps = [];
+      updateDisplay();
+      document.getElementById('laps').innerHTML = '';
+    }
+
+    function lap() {
+      if (startTime) {
+        const lapTime = Date.now() - startTime - (laps.length > 0 ? laps.reduce((acc, lap) => acc + lap, 0) : 0);
+        laps.push(lapTime);
+        const lapDisplay = document.createElement('li');
+        lapDisplay.innerText = formatTime(lapTime);
+        document.getElementById('laps').appendChild(lapDisplay);
+      }
+    }
+
+    function updateDisplay() {
+      const currentTime = Date.now() - startTime - (laps.length > 0 ? laps.reduce((acc, lap) => acc + lap, 0) : 0);
+      document.getElementById('display').innerText = formatTime(currentTime);
+    }
+
+    function formatTime(time) {
+      const minutes = Math.floor(time / (1000 * 60));
+      const seconds = Math.floor((time % (1000 * 60)) / 1000);
+      const milliseconds = Math.floor((time % 1000) / 10);
+      return `${minutes}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
+    }
+  </script>
+</body>
+</html>
